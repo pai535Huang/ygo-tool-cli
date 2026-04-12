@@ -3,7 +3,7 @@
 A simple CLI tool to search Yu-Gi-Oh! cards and render their images directly in the terminal via [ygocdb](https://ygocdb.com/) API.
 
 ## Features
-- Search card info (Password, Type, Race, Attribute, Level/Rank, Effects).
+- Search card info (Type, Race, Attribute, Level/Rank, Effects).
 - Native terminal image rendering (Kitty / Sixel protocols).
 - Fallback to URL output if protocols are unsupported.
 - Fetches HD official SC/JP card arts.
@@ -15,11 +15,18 @@ A simple CLI tool to search Yu-Gi-Oh! cards and render their images directly in 
 
 ## Usage
 
-Install globally via cargo:
+Directly run the binary.
 ```bash
-cargo install --path .
+chmod +x ./ygotool
 ```
-Then use it directly anywhere:
+then
+```bash
+./ygotool
+```
+If the directory is added into `$PATH` environment variable, simply invoke
+```bash
+ygotool
+```
 
 ### Interactive search
 ```bash
@@ -37,3 +44,11 @@ As the API supports fuzzy search, this mode prints the first search result from 
 ```bash
 ygotool img "Dark Magician"
 ```
+
+## Manual Installation
+
+Simply run 
+```bash
+cargo install --path .
+```
+and then use it anywhere. 
