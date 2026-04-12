@@ -1,6 +1,7 @@
 pub mod api;
 pub mod cmd_img;
 pub mod cmd_search;
+pub mod cmd_fzf;
 
 use clap::{Parser, Subcommand};
 
@@ -9,7 +10,7 @@ use clap::{Parser, Subcommand};
 #[command(about = "A CLI tool to search Yu-Gi-Oh! cards from ygocdb API", long_about = None)]
 struct Cli {
     #[command(subcommand)]
-    command: Commands,
+    command: Option<Commands>,
 }
 
 #[derive(Subcommand, Debug)]
@@ -24,6 +25,14 @@ enum Commands {
         /// The query string
         query: String,
     },
+    #[command(hide = true)]
+    FzfList {
+        query: String,
+    },
+    #[command(hide = true)]
+    FzfPreview {
+        id: String,
+    },
 }
 
 #[tokio::main]
@@ -31,14 +40,29 @@ async fn main() {
     let cli = Cli::parse();
 
     match &cli.command {
-        Commands::Search { query } => {
+        Some(Commands::Search { query }) => {
             if let Err(e) = cmd_search::run(query).await {
                 eprintln!("Error: {}", e);
             }
         }
-        Commands::Img { query } => {
+        Some(Commands::Img { query }) => {
             if let Err(e) = cmd_img::run(query).await {
                 eprintln!("Error: {}", e);
+            }
+        }
+        Some(Commands::FzfList { query }) => {
+            if let Err(e) = cmd_fzf::run_list(query).await {
+                eprintln!("Error: {}", e);
+            }
+        }
+        Some(Commands::FzfPreview { id }) => {
+            if let Err(e) = cmd_fzf::run_preview(id).await {
+                eprintln!("Error: {}", e);
+            }
+        }
+        None => {
+            if let Err(e) = cmd_fzf::run_fzf().await {
+                eprintln!("Error running fzf: {}", e);
             }
         }
     }

@@ -47,6 +47,16 @@ pub async fn search_card(query: &str) -> Result<Option<SearchItem>, reqwest::Err
     Ok(None)
 }
 
+pub async fn search_cards(query: &str) -> Result<Vec<SearchItem>, reqwest::Error> {
+    let url = format!("https://ygocdb.com/api/v0/?search={}", query);
+    let client = reqwest::Client::new();
+    let res = client.get(&url).send().await?.json::<SearchResponse>().await?;
+    if let Some(results) = res.result {
+        return Ok(results);
+    }
+    Ok(Vec::new())
+}
+
 pub async fn download_image(id: i64) -> Result<(String, Vec<u8>), reqwest::Error> {
     let sc_url = format!("https://cdn.233.momobako.com/ygoimg/sc/{}.webp", id);
     let sc_resp = reqwest::get(&sc_url).await?;
