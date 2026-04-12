@@ -17,3 +17,6 @@ Cargo.lock
 *.lib
 *.stat
 *.def
+
+# Ignore release note
+release_notes.md
