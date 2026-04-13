@@ -1,4 +1,10 @@
 use serde::{Deserialize, Serialize};
+use std::sync::OnceLock;
+
+fn get_client() -> &'static reqwest::Client {
+    static CLIENT: OnceLock<reqwest::Client> = OnceLock::new();
+    CLIENT.get_or_init(|| reqwest::Client::new())
+}
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct CardText {
@@ -35,10 +41,14 @@ pub struct SearchResponse {
 }
 
 pub async fn search_card(query: &str) -> Result<Option<SearchItem>, reqwest::Error> {
-    let url = format!("https://ygocdb.com/api/v0/?search={}", query);
-    // You could URL encode query if needed
-    let client = reqwest::Client::new();
-    let res = client.get(&url).send().await?.json::<SearchResponse>().await?;
+    let url = "https://ygocdb.com/api/v0/";
+    let res = get_client()
+        .get(url)
+        .query(&[("search", query)])
+        .send()
+        .await?
+        .json::<SearchResponse>()
+        .await?;
     if let Some(mut results) = res.result {
         if !results.is_empty() {
             return Ok(Some(results.remove(0)));
@@ -48,9 +58,14 @@ pub async fn search_card(query: &str) -> Result<Option<SearchItem>, reqwest::Err
 }
 
 pub async fn search_cards(query: &str) -> Result<Vec<SearchItem>, reqwest::Error> {
-    let url = format!("https://ygocdb.com/api/v0/?search={}", query);
-    let client = reqwest::Client::new();
-    let res = client.get(&url).send().await?.json::<SearchResponse>().await?;
+    let url = "https://ygocdb.com/api/v0/";
+    let res = get_client()
+        .get(url)
+        .query(&[("search", query)])
+        .send()
+        .await?
+        .json::<SearchResponse>()
+        .await?;
     if let Some(results) = res.result {
         return Ok(results);
     }
@@ -59,7 +74,7 @@ pub async fn search_cards(query: &str) -> Result<Vec<SearchItem>, reqwest::Error
 
 pub async fn download_image(id: i64) -> Result<(String, Vec<u8>), reqwest::Error> {
     let sc_url = format!("https://cdn.233.momobako.com/ygoimg/sc/{}.webp", id);
-    let sc_resp = reqwest::get(&sc_url).await?;
+    let sc_resp = get_client().get(&sc_url).send().await?;
     
     if sc_resp.status().is_success() {
         let bytes = sc_resp.bytes().await?;
@@ -67,7 +82,7 @@ pub async fn download_image(id: i64) -> Result<(String, Vec<u8>), reqwest::Error
     }
     
     let jp_url = format!("https://cdn.233.momobako.com/ygoimg/jp/{}.webp", id);
-    let jp_resp = reqwest::get(&jp_url).await?;
+    let jp_resp = get_client().get(&jp_url).send().await?;
     let bytes = jp_resp.error_for_status()?.bytes().await?;
     Ok((jp_url, bytes.to_vec()))
 }

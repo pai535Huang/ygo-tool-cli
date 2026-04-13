@@ -52,7 +52,7 @@ pub async fn run_fzf() -> Result<(), Box<dyn std::error::Error>> {
         if !selected.is_empty() {
             let parts: Vec<&str> = selected.split('\t').collect();
             if parts.len() >= 2 {
-                crate::cmd_search::run(parts[1]).await?;
+                crate::cmd_search::run(parts[0]).await?;
             }
         }
     }
