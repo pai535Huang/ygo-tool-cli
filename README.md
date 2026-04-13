@@ -1,17 +1,17 @@
-# ygo-tool-cli
+# YGOTOOL
 
 A simple CLI tool to search Yu-Gi-Oh! cards and render their images directly in the terminal via [ygocdb](https://ygocdb.com/) API.
 
 ## Features
 - Search card info (Type, Race, Attribute, Level/Rank, Effects).
-- Native terminal image rendering (Kitty / Sixel protocols).
+- Native terminal image rendering (Kitty protocol).
 - Fallback to URL output if protocols are unsupported.
 - Fetches HD official SC/JP card arts.
 
 ## Dependencies
 - [Rust / Cargo](https://rustup.rs/) (to build/install)
 - [fzf](https://github.com/junegunn/fzf) (for interactive search)
-- Terminal with Kitty or Sixel graphics protocol support (for `img` command)
+- Terminal with Kitty graphics protocol support (for `img` command)
 
 ## Usage
 

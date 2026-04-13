@@ -1,6 +1,6 @@
 use crate::api::{download_image, search_card};
 use viuer::{Config, print};
-use viuer::{is_sixel_supported, get_kitty_support, KittySupport};
+use viuer::{get_kitty_support, KittySupport};
 
 pub async fn run(query: &str) -> Result<(), Box<dyn std::error::Error>> {
     let result = search_card(query).await?;
@@ -9,11 +9,10 @@ pub async fn run(query: &str) -> Result<(), Box<dyn std::error::Error>> {
         println!("Downloading image for {} (ID: {})...", card.cn_name.as_deref().unwrap_or("Unknown").to_string(), card.id);
         
         let kitty = get_kitty_support() != KittySupport::None;
-        let sixel = is_sixel_supported();
         
         let (url, image_bytes) = download_image(card.id).await?;
         
-        if kitty || sixel {
+        if kitty {
             let img = image::load_from_memory(&image_bytes)?;
             
             let mut conf = Config::default();
@@ -25,7 +24,6 @@ pub async fn run(query: &str) -> Result<(), Box<dyn std::error::Error>> {
             conf.width = Some(26);
             conf.height = Some(16);
             conf.use_kitty = kitty;
-            conf.use_sixel = !kitty && sixel;
             conf.use_iterm = false;
             
             print(&img, &conf)?;
